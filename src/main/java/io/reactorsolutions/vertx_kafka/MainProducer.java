@@ -1,10 +1,11 @@
 package io.reactorsolutions.vertx_kafka;
 
+import io.reactorsolutions.vertx_kafka.verticles.ProducerExample;
 import io.vertx.core.Vertx;
 
-public class MainLoop {
+public class MainProducer {
   public static void main(String[] args) {
     Vertx vertx = Vertx.vertx();
-    vertx.deployVerticle(Producer.class.getName());
+    vertx.deployVerticle(ProducerExample.class.getName());
   }
 }
