@@ -25,22 +25,23 @@ public class BrolyVerticle extends AbstractVerticle {
   private Fighter fighter;
 
   public BrolyVerticle() {
-    producer = new Producer(vertx);
-    consumer = new Consumer(vertx);
     fighter = new Fighter("Broly", 500, 500, 20, 50, 500, 100, 100, "KAKAROTTOOO!");
   }
 
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
     String deploymentID = vertx.getOrCreateContext().deploymentID();
-    startPromise.complete();
+    producer = new Producer(vertx);
+    consumer = new Consumer(vertx);
+
     producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(recordMetadata -> {
       System.out.println(" written on topic=" + recordMetadata.getTopic() +
         ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
       );
-    });
+    }).onFailure(err -> err.printStackTrace());
     //vertx.eventBus().consumer(SECONDLOCATION, getDamageHandler(deploymentID));
-    vertx.setPeriodic(fighter.aSpd() + 3000, handler -> fighterTurn());
+    vertx.setPeriodic(fighter.aSpd()+2000, handler -> fighterTurn());
+    startPromise.complete();
   }
 
   public Handler<Message<String>> getDamageHandler(String deploymentID) {
@@ -66,10 +67,11 @@ public class BrolyVerticle extends AbstractVerticle {
   public void fighterTurn() {
     fighter.attack();
     fighter.checkStats();
-    producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(recordMetadata -> {
-      System.out.println(" written on topic=" + recordMetadata.getTopic() +
-        ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
-      );
-    });
+    producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject()))
+      .onSuccess(recordMetadata -> {
+        System.out.println(" written on topic=" + recordMetadata.getTopic() +
+          ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
+        );
+      }).onFailure(err -> err.printStackTrace());
   }
 }
