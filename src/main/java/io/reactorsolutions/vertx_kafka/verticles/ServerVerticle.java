@@ -28,6 +28,7 @@ public class ServerVerticle extends AbstractVerticle {
   public void start() throws Exception {
 
     HttpServer server = vertx.createHttpServer();
+    vertx.deployVerticle(EnemyVerticle.class.getName());
     Router router = Router.router(vertx);
     router.get("/users").handler(this::getAllUsersHandler);
     router.get("/users/:username").handler(this::getUserHpHandler);
@@ -39,15 +40,16 @@ public class ServerVerticle extends AbstractVerticle {
 
   private void getUserHpHandler(RoutingContext ctx) {
     String usernameParam = ctx.pathParam("username");
+    var deploymentId = register.getConnectedUsers().get(usernameParam);
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
-    if (register.isConnectedUser(usernameParam)) {
-      var deploymentId = register.getConnectedUsers().get(usernameParam);
+    if (register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId)) {
       vertx.eventBus().<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
         LOG.debug("Message received: {}", reply.body());
         serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(reply.body().toBuffer());
       });
     } else {
-      serverResponse.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
+      register.unregister(deploymentId);
+      serverResponse.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end(new JsonObject().toBuffer());
     }
   }
 

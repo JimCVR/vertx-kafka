@@ -20,25 +20,31 @@ public class UserVerticle extends AbstractVerticle {
     deploymentID = ctx.deploymentID();
     this.username = ctx.config().getString("username");
     this.hp = ctx.config().getInteger("hp");
-    sendStatus();
+    sendStatus();consumeMessage();
     LOG.debug("{} said: Hello world, this is my id: {} and my hp {}", username, deploymentID, hp);
   }
 
   public void sendStatus() {
-    JsonObject userData = new JsonObject()
-      .put("username", username)
-      .put("deploymentID", deploymentID)
-      .put("hp", hp);
     vertx.eventBus().consumer(deploymentID, message -> {
+      JsonObject userData = new JsonObject()
+        .put("username", username)
+        .put("deploymentID", deploymentID)
+        .put("hp", hp);
       message.reply(userData);
       LOG.debug("Reply sent: {}", userData.toString());
     });
   }
 
   public void consumeMessage() {
-    vertx.eventBus().<Integer>consumer(deploymentID + ".consumer", message -> {
+    vertx.eventBus().<Integer>consumer(EnemyVerticle.LOCATION, message -> {
       int dmg = message.body();
-      hp -= dmg;
+      if(hp > 0 && hp >= dmg){
+        hp -= dmg;
+        LOG.debug("{} : current hp {} , damage received {}", username, hp , dmg);
+      } else {
+        hp = 0;
+        vertx.undeploy(deploymentID).onSuccess(s -> LOG.debug("{}: current hp {} , defeated", username, hp));
+      }
     });
   }
 }
