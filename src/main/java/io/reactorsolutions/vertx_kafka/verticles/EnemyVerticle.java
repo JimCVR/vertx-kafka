@@ -1,7 +1,6 @@
 package io.reactorsolutions.vertx_kafka.verticles;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +10,8 @@ public class EnemyVerticle extends AbstractVerticle {
   public static final String LOCATION = "damage.location";
 
   @Override
-  public void start(Promise<Void> startPromise) throws Exception {
+  public void start() throws Exception {
     vertx.setPeriodic(1500, handler -> attack());
-    startPromise.complete();
   }
 
   public void attack() {

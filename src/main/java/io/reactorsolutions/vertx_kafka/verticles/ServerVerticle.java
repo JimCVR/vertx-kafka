@@ -5,7 +5,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactorsolutions.vertx_kafka.models.Register;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Promise;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
@@ -14,8 +13,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 public class ServerVerticle extends AbstractVerticle {
 
@@ -28,15 +25,37 @@ public class ServerVerticle extends AbstractVerticle {
   }
 
   @Override
-  public void start(Promise<Void> startPromise) throws Exception {
+  public void start() throws Exception {
 
     HttpServer server = vertx.createHttpServer();
-    startPromise.complete();
     Router router = Router.router(vertx);
-    router.post("/users/:username").handler(ctx -> handleUsers(ctx));
-    router.post("/users/delete/:username").handler(ctx -> handleDeletedUsers(ctx));
+    router.get("/users").handler(this::getAllUsersHandler);
+    router.get("/users/:username").handler(this::getUserHpHandler);
+    router.post("/users/:username").handler(this::handleUsers);
+    router.post("/users/delete/:username").handler(this::handleDeletedUsers);
     server.requestHandler(router);
     server.listen(8080);
+  }
+
+  private void getUserHpHandler(RoutingContext ctx) {
+    String usernameParam = ctx.pathParam("username");
+    HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+    if (register.isConnectedUser(usernameParam)) {
+      var deploymentId = register.getConnectedUsers().get(usernameParam);
+      vertx.eventBus().<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
+        LOG.debug("Message received: {}", reply.body());
+        serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(reply.body().toBuffer());
+      });
+    } else {
+      serverResponse.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
+    }
+  }
+
+  private void getAllUsersHandler(RoutingContext ctx) {
+
+    JsonObject response = JsonObject.mapFrom(register.getConnectedUsers());
+    HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+    serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(response.toBuffer());
   }
 
   private void handleDeletedUsers(RoutingContext ctx) {
@@ -44,8 +63,8 @@ public class ServerVerticle extends AbstractVerticle {
     String response;
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN);
     if (register.isConnectedUser(usernameParam)) {
-      vertx.undeploy(register.getConnectedUsers().get(usernameParam) , handler -> {
-        if (handler.succeeded()){
+      vertx.undeploy(register.getConnectedUsers().get(usernameParam), handler -> {
+        if (handler.succeeded()) {
           LOG.debug("Undeploy successful with id {}", register.getConnectedUsers().get(usernameParam));
           register.unregister(usernameParam);
         }
@@ -61,13 +80,14 @@ public class ServerVerticle extends AbstractVerticle {
 
   private void handleUsers(RoutingContext ctx) {
     String usernameParam = ctx.pathParam("username");
+    int hp = (int) (Math.random() * 50) + 100;
     String response;
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN);
     if (!register.isConnectedUser(usernameParam)) {
-      vertx.deployVerticle(UserVerticle.class.getName(), new DeploymentOptions().setConfig(new JsonObject().put("username", usernameParam)))
+      vertx.deployVerticle(UserVerticle.class.getName(), new DeploymentOptions().setConfig(new JsonObject().put("username", usernameParam).put("hp", hp)))
         .onSuccess(id -> {
             LOG.debug("Deployment successful with id {}", id);
-            register.register(usernameParam,id);
+            register.register(usernameParam, id);
           }
         ).onFailure(err -> LOG.error("Failure! ", err));
       response = "Connected user with name: " + usernameParam;
