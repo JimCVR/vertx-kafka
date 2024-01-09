@@ -1,5 +1,6 @@
 package io.reactorsolutions.vertx_kafka.verticles;
 
+import io.reactorsolutions.vertx_kafka.models.Register;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import lombok.Data;
@@ -12,16 +13,29 @@ public class UserVerticle extends AbstractVerticle {
   private String username;
   private String deploymentID;
 
-  private int hp;
+  private int maxHp;
+  private int currentHp;
+
+  private Register register;
 
   @Override
   public void start() throws Exception {
     var ctx = vertx.getOrCreateContext();
     deploymentID = ctx.deploymentID();
-    this.username = ctx.config().getString("username");
-    this.hp = ctx.config().getInteger("hp");
-    sendStatus();consumeMessage();
-    LOG.debug("{} said: Hello world, this is my id: {} and my hp {}", username, deploymentID, hp);
+    username = ctx.config().getString("username");
+    maxHp = ctx.config().getInteger("hp");
+    currentHp = maxHp;
+    register = Register.getInstance();
+    sendStatus();
+    consumeMessage();
+    vertx.setPeriodic(1000, handler -> attack());
+    LOG.debug("{} JOINS THE BATTLE!", username);
+  }
+
+  public void attack() {
+    var dmg = (int) (Math.random() * 50) + 1;
+    LOG.debug("{} attacks: {} dmg", username, dmg);
+    vertx.eventBus().send(EnemyVerticle.LOCATION2, dmg);
   }
 
   public void sendStatus() {
@@ -29,7 +43,7 @@ public class UserVerticle extends AbstractVerticle {
       JsonObject userData = new JsonObject()
         .put("username", username)
         .put("deploymentID", deploymentID)
-        .put("hp", hp);
+        .put("hp", currentHp);
       message.reply(userData);
       LOG.debug("Reply sent: {}", userData.toString());
     });
@@ -38,12 +52,13 @@ public class UserVerticle extends AbstractVerticle {
   public void consumeMessage() {
     vertx.eventBus().<Integer>consumer(EnemyVerticle.LOCATION, message -> {
       int dmg = message.body();
-      if(hp > 0 && hp >= dmg){
-        hp -= dmg;
-        LOG.debug("{} : current hp {} , damage received {}", username, hp , dmg);
+      if (currentHp > 0 && currentHp >= dmg) {
+        currentHp -= dmg;
+        LOG.debug("{} : hp {}/{} , damage received {}", username, currentHp, maxHp, dmg);
       } else {
-        hp = 0;
-        vertx.undeploy(deploymentID).onSuccess(s -> LOG.debug("{}: current hp {} , defeated", username, hp));
+        currentHp = 0;
+        register.unregister(username);
+        vertx.undeploy(deploymentID).onSuccess(s -> LOG.debug("{}: current hp {} , defeated", username, currentHp));
       }
     });
   }

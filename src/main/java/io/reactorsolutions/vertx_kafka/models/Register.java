@@ -6,10 +6,20 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Register {
+public final class Register {
 
   private static final Logger LOG = LoggerFactory.getLogger(Register.class);
-  private final Map<String, String> connectedUsers = new HashMap<>();
+
+  private static Register instance;
+  private static Map<String, String> connectedUsers;
+
+  public static Register getInstance(){
+    if(instance == null){
+      instance = new Register();
+      connectedUsers = new HashMap<>();
+    }
+    return instance;
+  }
 
   public void register(String username, String deploymentId){
     connectedUsers.put(username, deploymentId);

@@ -21,7 +21,7 @@ public class ServerVerticle extends AbstractVerticle {
   Register register;
 
   public ServerVerticle() {
-    register = new Register();
+    register = Register.getInstance();
   }
 
   @Override
@@ -44,17 +44,15 @@ public class ServerVerticle extends AbstractVerticle {
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     if (register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId)) {
       vertx.eventBus().<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
-        LOG.debug("Message received: {}", reply.body());
+        LOG.debug("Message received: {}", reply.body().toBuffer());
         serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(reply.body().toBuffer());
       });
     } else {
-      register.unregister(deploymentId);
       serverResponse.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end(new JsonObject().toBuffer());
     }
   }
 
   private void getAllUsersHandler(RoutingContext ctx) {
-
     JsonObject response = JsonObject.mapFrom(register.getConnectedUsers());
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(response.toBuffer());
@@ -64,20 +62,16 @@ public class ServerVerticle extends AbstractVerticle {
     String usernameParam = ctx.pathParam("username");
     String response;
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN);
-    if (register.isConnectedUser(usernameParam)) {
-      vertx.undeploy(register.getConnectedUsers().get(usernameParam), handler -> {
-        if (handler.succeeded()) {
-          LOG.debug("Undeploy successful with id {}", register.getConnectedUsers().get(usernameParam));
-          register.unregister(usernameParam);
-        }
-      });
+    var deploymentId = register.getConnectedUsers().get(usernameParam);
+    if (register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId)) {
+      register.unregister(usernameParam);
+      vertx.undeploy(deploymentId);
       response = "Disconnected user with name: " + usernameParam;
       serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(response);
     } else {
       response = "User with name: " + usernameParam + " doesn't exists";
       serverResponse.setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end(response);
     }
-
   }
 
   private void handleUsers(RoutingContext ctx) {
@@ -99,4 +93,12 @@ public class ServerVerticle extends AbstractVerticle {
       serverResponse.setStatusCode(HttpResponseStatus.PRECONDITION_FAILED.code()).end(response);
     }
   }
+
+  /*private boolean removeUser(String usernameParam,String deploymentId){
+    if (!(register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId))){
+      register.unregister(usernameParam);
+      return true;
+    }
+    return false;
+  }*/
 }
