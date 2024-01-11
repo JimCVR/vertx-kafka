@@ -6,7 +6,7 @@ import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserVerticle extends AbstractVerticle {
+public class WarriorVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
   private String username;
   private String deploymentID;
@@ -46,7 +46,6 @@ public class UserVerticle extends AbstractVerticle {
     });
   }
 
-  //TODO more descriptive name
   private void handlingDamageReceived() {
     vertx.eventBus().<Integer>consumer(EnemyVerticle.ENEMY_LOCATION, message -> {
       int dmg = message.body();

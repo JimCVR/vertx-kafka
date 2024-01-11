@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 public class EnemyVerticle extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(EnemyVerticle.class);
-
-  //TODO cambiar LOCATIONS y mejorar inglés
   public static final String ENEMY_LOCATION = "damage.dealt";
   public static final String WARRIOR_LOCATION = "damage.received";
   private String deploymentId;

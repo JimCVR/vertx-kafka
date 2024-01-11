@@ -73,7 +73,7 @@ public class ServerVerticle extends AbstractVerticle {
     String response;
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN);
     if (!Register.isConnectedUser(usernameParam)) {
-      vertx.deployVerticle(UserVerticle.class.getName(), new DeploymentOptions().setConfig(new JsonObject().put("username", usernameParam).put("hp", hp)))
+      vertx.deployVerticle(WarriorVerticle.class.getName(), new DeploymentOptions().setConfig(new JsonObject().put("username", usernameParam).put("hp", hp)))
         .onSuccess(id -> {
             LOG.debug("Deployment successful with id {}", id);
             Register.register(usernameParam, id);
