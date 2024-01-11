@@ -2,7 +2,7 @@ package io.reactorsolutions.actors.verticles;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.reactorsolutions.actors.singleton.Register;
+import io.reactorsolutions.actors.manager.Register;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpHeaders;

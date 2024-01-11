@@ -1,7 +1,9 @@
 package io.reactorsolutions.actors.verticles;
 
-import io.reactorsolutions.actors.singleton.Register;
+import io.reactorsolutions.actors.manager.Register;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,11 @@ public class WarriorVerticle extends AbstractVerticle {
 
   private int maxHp;
   private int currentHp;
+
+  @Override
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx, context);
+  }
 
   @Override
   public void start() {
