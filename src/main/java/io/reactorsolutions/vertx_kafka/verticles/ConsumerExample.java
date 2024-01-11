@@ -19,12 +19,14 @@ public class ConsumerExample extends AbstractVerticle {
     //config.put("value.deserializer", "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
     config.put("group.id","my_group");
     config.put("enable.auto.commit","false");
-    startPromise.complete();
+
     KafkaConsumer<String, JsonObject> consumer = KafkaConsumer.create(vertx, config, String.class, JsonObject.class);
-    consumer.subscribe("topic1").onSuccess(v -> System.out.println("subscribed")).onFailure(err-> err.printStackTrace());
+    consumer.subscribe("broly").onSuccess(v -> System.out.println("subscribed")).onFailure(err-> err.printStackTrace());
     consumer.handler( record ->{
       System.out.println("Key : "+ record.key() + ", value: " + record.value());
       consumer.commit();
+
     });
+    startPromise.complete();
   }
 }
