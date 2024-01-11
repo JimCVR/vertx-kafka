@@ -6,7 +6,7 @@
     </encoder>
   </appender>
 
-  <logger name="io.reactorsolutions.vertx_kafka" level="DEBUG"/>
+  <logger name="io.reactorsolutions" level="DEBUG"/>
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
   </root>

@@ -1,4 +1,4 @@
-package io.reactorsolutions.vertx_kafka;
+package io.reactorsolutions.actors;
 
 
 import java.io.IOException;
