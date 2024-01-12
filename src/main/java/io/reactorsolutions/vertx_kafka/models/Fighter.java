@@ -79,35 +79,10 @@ public class Fighter {
     }
   }
 
-
   public void checkStats(){
       recoverHealth();
       recoverStam();
   }
-
-  private void recoverStam() {
-    if(currentStam <= 50) {
-      val stamRegen = regenerate(maxStam, currentStam, regen);
-      LOG.debug("Broly recovered stamina: {} +{}", currentStam, stamRegen);
-      setCurrentStam(stamRegen);
-    }
-  }
-
-  private void recoverHealth() {
-    if(currentHp <= maxHp*0.35) {
-      val hpRegen = regenerate(maxHp, currentHp, regen);
-      LOG.debug("Broly Healed: {} +{}", currentHp, hpRegen);
-      setCurrentHp(hpRegen);
-    }
-  }
-
-
-
-  private int regenerate(int maxStat, int stat, int regen){
-    return maxStat < stat + regen + (int)(Math.random()*20)+1 ? maxStat : regen + stat - (int)(Math.random()*10)+1;
-  }
-
-
 
   public void showStatus() {
     System.out.println(getName().toUpperCase() + " [HP : " + currentHp + "/" + maxHp + "]");
@@ -134,5 +109,25 @@ public class Fighter {
       }
     }
     return hpBar;
+  }
+
+  private void recoverHealth() {
+    if(currentHp <= maxHp*0.35) {
+      val hpRegen = regenerate(maxHp, currentHp, regen);
+      LOG.debug("Broly Healed: {} +{}", currentHp, hpRegen);
+      setCurrentHp(hpRegen);
+    }
+  }
+
+  private void recoverStam() {
+    if(currentStam <= 50) {
+      val stamRegen = regenerate(maxStam, currentStam, regen);
+      LOG.debug("Broly recovered stamina: {} +{}", currentStam, stamRegen);
+      setCurrentStam(stamRegen);
+    }
+  }
+
+  private int regenerate(int maxStat, int stat, int regen){
+    return maxStat < stat + regen + (int)(Math.random()*20)+1 ? maxStat : regen + stat - (int)(Math.random()*10)+1;
   }
 }
