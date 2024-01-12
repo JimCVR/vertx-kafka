@@ -21,9 +21,10 @@ public class WarriorVerticle extends AbstractVerticle {
   public void init(Vertx vertx, Context context) {
     super.init(vertx,context);
     var ctx = vertx.getOrCreateContext();
+    var config = ctx.config();
     deploymentID = ctx.deploymentID();
-    username = ctx.config().getString("username");
-    maxHp = ctx.config().getInteger("hp");
+    username = config.getString("username");
+    maxHp = config.getInteger("hp");
     currentHp = maxHp;
     eventBus = vertx.eventBus();
   }

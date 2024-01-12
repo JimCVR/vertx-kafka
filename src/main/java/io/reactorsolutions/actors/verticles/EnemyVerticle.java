@@ -11,14 +11,14 @@ public class EnemyVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(EnemyVerticle.class);
   public static final String ENEMY_LOCATION = "damage.dealt";
   public static final String WARRIOR_LOCATION = "damage.received";
+  private static final int MAX_HP = 200;
   private String deploymentId;
-  private final int maxHp = 200;
   private int currentHp;
 
   @Override
   public void init(Vertx vertx, Context context) {
     super.init(vertx, context);
-    currentHp = maxHp;
+    currentHp = MAX_HP;
     deploymentId = vertx.getOrCreateContext().deploymentID();
   }
 
@@ -37,12 +37,12 @@ public class EnemyVerticle extends AbstractVerticle {
   }
 
   private void regen() {
-    int regen = (int) ((maxHp * 0.3) + (Math.random() * 20) + 1);
+    int regen = (int) ((MAX_HP * 0.3) + (Math.random() * 20) + 1);
     LOG.debug("Enemy regen: +{}", regen);
-    if (maxHp > currentHp + regen) {
+    if (MAX_HP > currentHp + regen) {
       currentHp += regen;
     } else {
-      currentHp = maxHp;
+      currentHp = MAX_HP;
     }
     LOG.debug("Enemy hp: {}", currentHp);
 
