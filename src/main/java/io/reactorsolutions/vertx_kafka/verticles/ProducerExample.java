@@ -27,13 +27,7 @@ public class ProducerExample extends AbstractVerticle {
 
     vertx.setPeriodic(200, handler -> {
       producer.getProducer().send(KafkaProducerRecord.create("topic1","key1" ,new JsonObject().put(counter+"","hello world " +counter)))
-        .onSuccess(recordMetadata ->{
-          counter++;
-
-          System.out.println(" written on topic=" + recordMetadata.getTopic() +
-            ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
-          );
-        })
+        .onSuccess(recordMetadata -> counter++)
         .onFailure(Throwable::printStackTrace);
     });
     startPromise.complete();
