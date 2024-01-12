@@ -29,8 +29,6 @@ public class WarriorVerticle extends AbstractVerticle {
     eventBus = vertx.eventBus();
   }
 
-
-
   @Override
   public void start() {
     handlingStatusRequest();
@@ -38,12 +36,6 @@ public class WarriorVerticle extends AbstractVerticle {
     vertx.setPeriodic(1000, handler -> attack());
 
     LOG.debug("{} JOINS THE BATTLE!", username);
-  }
-
-  private void attack() {
-    var dmg = (int) (Math.random() * 50) + 1;
-    LOG.debug("{} attacks: {} dmg", username, dmg);
-    eventBus.send(EnemyVerticle.WARRIOR_LOCATION, dmg);
   }
 
   private void handlingStatusRequest() {
@@ -69,5 +61,11 @@ public class WarriorVerticle extends AbstractVerticle {
         vertx.undeploy(deploymentID).onSuccess(s -> LOG.debug("{}: current hp {} , defeated", username, currentHp));
       }
     });
+  }
+
+  private void attack() {
+    var dmg = (int) (Math.random() * 50) + 1;
+    LOG.debug("{} attacks: {} dmg", username, dmg);
+    eventBus.send(EnemyVerticle.WARRIOR_LOCATION, dmg);
   }
 }

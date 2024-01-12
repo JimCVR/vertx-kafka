@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 public class EnemyVerticle extends AbstractVerticle {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EnemyVerticle.class);
   public static final String ENEMY_LOCATION = "damage.dealt";
   public static final String WARRIOR_LOCATION = "damage.received";
+  private static final Logger LOG = LoggerFactory.getLogger(EnemyVerticle.class);
   private static final int MAX_HP = 200;
   private String deploymentId;
   private int currentHp;
@@ -30,6 +30,20 @@ public class EnemyVerticle extends AbstractVerticle {
     vertx.setPeriodic(5000, handler -> regen());
   }
 
+  private void handlingDamageReceived() {
+    vertx.eventBus().<Integer>consumer(EnemyVerticle.WARRIOR_LOCATION, message -> {
+      int dmg = message.body();
+      if (currentHp > 0 && currentHp >= dmg) {
+        currentHp -= dmg;
+        LOG.debug("Enemy : HP {} , damage received {}", currentHp, dmg);
+      } else {
+        currentHp = 0;
+        vertx.undeploy(deploymentId)
+          .onSuccess(s -> LOG.debug("Enemy: HP {} , DEFEATED", currentHp));
+      }
+    });
+  }
+
   private void attack() {
     var dmg = (int) (Math.random() * 50) + 1;
     vertx.eventBus().publish(ENEMY_LOCATION, dmg);
@@ -46,19 +60,5 @@ public class EnemyVerticle extends AbstractVerticle {
     }
     LOG.debug("Enemy hp: {}", currentHp);
 
-  }
-
-  private void handlingDamageReceived() {
-    vertx.eventBus().<Integer>consumer(EnemyVerticle.WARRIOR_LOCATION, message -> {
-      int dmg = message.body();
-      if (currentHp > 0 && currentHp >= dmg) {
-        currentHp -= dmg;
-        LOG.debug("Enemy : HP {} , damage received {}", currentHp, dmg);
-      } else {
-        currentHp = 0;
-        vertx.undeploy(deploymentId)
-          .onSuccess(s -> LOG.debug("Enemy: HP {} , DEFEATED", currentHp));
-      }
-    });
   }
 }
