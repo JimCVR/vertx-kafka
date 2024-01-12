@@ -1,6 +1,8 @@
 package io.reactorsolutions.actors.verticles;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
+import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +15,16 @@ public class EnemyVerticle extends AbstractVerticle {
   private final int maxHp = 200;
   private int currentHp;
 
-  public EnemyVerticle() {
+  @Override
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx, context);
     currentHp = maxHp;
+    deploymentId = vertx.getOrCreateContext().deploymentID();
   }
 
   @Override
   public void start() {
-    deploymentId = vertx.getOrCreateContext().deploymentID();
+
     handlingDamageReceived();
     vertx.setPeriodic(1000, handler -> attack());
     vertx.setPeriodic(5000, handler -> regen());

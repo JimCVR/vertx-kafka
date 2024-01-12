@@ -4,6 +4,7 @@ import io.reactorsolutions.actors.manager.Register;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +13,25 @@ public class WarriorVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
   private String username;
   private String deploymentID;
-
+  private EventBus eventBus;
   private int maxHp;
   private int currentHp;
 
   @Override
-  public void start() {
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx,context);
     var ctx = vertx.getOrCreateContext();
     deploymentID = ctx.deploymentID();
     username = ctx.config().getString("username");
     maxHp = ctx.config().getInteger("hp");
     currentHp = maxHp;
+    eventBus = vertx.eventBus();
+  }
 
+
+
+  @Override
+  public void start() {
     handlingStatusRequest();
     handlingDamageReceived();
     vertx.setPeriodic(1000, handler -> attack());
@@ -34,11 +42,11 @@ public class WarriorVerticle extends AbstractVerticle {
   private void attack() {
     var dmg = (int) (Math.random() * 50) + 1;
     LOG.debug("{} attacks: {} dmg", username, dmg);
-    vertx.eventBus().send(EnemyVerticle.WARRIOR_LOCATION, dmg);
+    eventBus.send(EnemyVerticle.WARRIOR_LOCATION, dmg);
   }
 
   private void handlingStatusRequest() {
-    vertx.eventBus().consumer(deploymentID, message -> {
+    eventBus.consumer(deploymentID, message -> {
       JsonObject userData = new JsonObject()
         .put("username", username)
         .put("deploymentID", deploymentID)
@@ -49,7 +57,7 @@ public class WarriorVerticle extends AbstractVerticle {
   }
 
   private void handlingDamageReceived() {
-    vertx.eventBus().<Integer>consumer(EnemyVerticle.ENEMY_LOCATION, message -> {
+    eventBus.<Integer>consumer(EnemyVerticle.ENEMY_LOCATION, message -> {
       int dmg = message.body();
       if (currentHp > 0 && currentHp >= dmg) {
         currentHp -= dmg;
