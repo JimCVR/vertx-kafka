@@ -1,6 +1,6 @@
 package io.reactorsolutions.vertx_kafka;
 
-import io.reactorsolutions.vertx_kafka.verticles.ConsumerExample;
+import io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -13,7 +13,7 @@ public class TestMainVerticle {
 
   @BeforeEach
   void deploy_verticle(Vertx vertx, VertxTestContext testContext) {
-    vertx.deployVerticle(new ConsumerExample(), testContext.succeeding(id -> testContext.completeNow()));
+    vertx.deployVerticle(new ConsumerVerticle(), testContext.succeeding(id -> testContext.completeNow()));
   }
 
   @Test

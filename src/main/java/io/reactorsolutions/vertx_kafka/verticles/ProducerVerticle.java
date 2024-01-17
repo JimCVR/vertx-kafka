@@ -8,9 +8,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.kafka.client.producer.KafkaProducer;
 import io.vertx.kafka.client.producer.KafkaProducerRecord;
-import org.apache.kafka.common.internals.Topic;
 
-public class ProducerExample extends AbstractVerticle {
+public class ProducerVerticle extends AbstractVerticle {
   private static final String KEY_1 = "kafka";
   private static final String KEY_2 = "vertx";
   private KafkaProducer<String, JsonObject> producer;

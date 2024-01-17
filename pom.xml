@@ -19,7 +19,7 @@
     <vertx.version>4.5.1</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
 
-    <main.verticle>io.reactorsolutions.vertx_kafka.verticles.ConsumerExample</main.verticle>
+    <main.verticle>io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle</main.verticle>
     <launcher.class>io.vertx.core.Launcher</launcher.class>
   </properties>
 

@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
-import static io.reactorsolutions.vertx_kafka.verticles.ConsumerExample.SERVER_URI;
+import static io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle.SERVER_URI;
 
 public class MainCoreConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MainCoreConsumer.class);
