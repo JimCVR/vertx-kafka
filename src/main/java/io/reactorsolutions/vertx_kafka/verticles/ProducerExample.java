@@ -1,35 +1,38 @@
 package io.reactorsolutions.vertx_kafka.verticles;
 
-import io.reactorsolutions.vertx_kafka.producer_consumer.Producer;
+import io.reactorsolutions.vertx_kafka.config.producer.ProducerOptions;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.kafka.client.producer.KafkaProducer;
 import io.vertx.kafka.client.producer.KafkaProducerRecord;
-import netscape.javascript.JSObject;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.kafka.common.internals.Topic;
 
 public class ProducerExample extends AbstractVerticle {
-  private int counter;
-  private KafkaProducer<String, JSObject> producer;
+  private static final String KEY_1 = "kafka";
+  private static final String KEY_2 = "vertx";
+  private KafkaProducer<String, JsonObject> producer;
+
 
   @Override
-  public void start(Promise<Void> startPromise) throws Exception {
-    Map<String, String> config = new HashMap<>();
-    config.put("bootstrap.servers", "localhost:29092,localhost:39092");
-    config.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    config.put("value.serializer", "io.vertx.kafka.client.serialization.JsonObjectSerializer");
-    config.put("acks", "1");
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx, context);
+    producer = KafkaProducer.create(vertx, new ProducerOptions().getConfig());
+  }
 
-    Producer producer = new Producer(vertx);
-
-    vertx.setPeriodic(200, handler -> {
-      producer.getProducer().send(KafkaProducerRecord.create("topic1","key1" ,new JsonObject().put(counter+"","hello world " +counter)))
-        .onSuccess(recordMetadata -> counter++)
+  @Override
+  public void start(Promise<Void> startPromise) {
+    for (int i = 0; i < 10; i++) {
+      producer.send(KafkaProducerRecord.create("topic33", KEY_1, new JsonObject().put(KEY_1 + "", "" + i)))
+        .onSuccess(recordMetadata -> System.out.println(recordMetadata.getOffset()))
         .onFailure(Throwable::printStackTrace);
-    });
+
+      producer.send(KafkaProducerRecord.create("topic33", KEY_2, new JsonObject().put(KEY_2 + "", "" + (i+i))))
+        .onSuccess(recordMetadata -> System.out.println(recordMetadata.getOffset()))
+        .onFailure(Throwable::printStackTrace);
+    }
     startPromise.complete();
   }
 }
