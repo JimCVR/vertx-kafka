@@ -21,6 +21,8 @@ public class MainCoreConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MainCoreConsumer.class);
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     KafkaConsumer<String, JsonObject> consumer = new KafkaConsumer<>(new ConsumerOptions().getConfig());
+    var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
+    var client  = HttpClient.newHttpClient();
 
     consumer.subscribe(Arrays.asList("baeldung"));
 
@@ -30,8 +32,6 @@ public class MainCoreConsumer {
 
       for (ConsumerRecord<String, JsonObject> record : records) {
         LOG.debug("Record value: {} , offset: {}",record.value(), record.offset());
-        var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
-        var client  = HttpClient.newHttpClient();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
           .thenAccept(result -> System.out.println("body: "+ result.body() +", status code: "+result.statusCode()))
           .thenAccept(v -> System.out.println(Thread.currentThread().getName()))
