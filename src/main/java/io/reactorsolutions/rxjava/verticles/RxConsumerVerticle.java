@@ -2,13 +2,8 @@ package io.reactorsolutions.rxjava.verticles;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.CompletableSource;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactorsolutions.vertx_kafka.MainVertxConsumer;
 import io.reactorsolutions.vertx_kafka.config.consumer.ConsumerOptions;
 import io.vertx.core.Context;
-import io.vertx.core.Promise;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.core.AbstractVerticle;
@@ -18,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class RxConsumerVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(RxConsumerVerticle.class);
@@ -41,9 +35,6 @@ public class RxConsumerVerticle extends AbstractVerticle {
         .buffer(5)
         .map(ArrayList::new)
         .subscribe(val -> val.forEach(it-> System.out.println(it.toString()))));
-
-    //var flowableConsumer = consumer.subscribe("rxJava").toFlowable();
-    //return consumer.subscribe("rxJava");
   }
 
   private void consumerHandler(KafkaConsumerRecord<String, JsonObject> record) {

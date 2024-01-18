@@ -40,7 +40,6 @@ public class BrolyVerticle extends AbstractVerticle {
     producer.send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(v ->{
       LOG.debug("Message sent");
     });
-    //vertx.eventBus().consumer(SECONDLOCATION, getDamageHandler(deploymentID));
     vertx.setPeriodic(fighter.aSpd()+2000, handler -> fighterTurn());
     startPromise.complete();
   }

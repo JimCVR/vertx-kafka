@@ -2,15 +2,13 @@ package io.reactorsolutions.rxjava.verticles;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactorsolutions.vertx_kafka.config.producer.ProducerOptions;
 import io.vertx.core.Context;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava3.kafka.client.producer.KafkaProducerRecord;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.kafka.client.producer.KafkaProducer;
+import io.vertx.rxjava3.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

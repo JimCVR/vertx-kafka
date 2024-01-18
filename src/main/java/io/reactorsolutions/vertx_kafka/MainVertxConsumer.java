@@ -1,6 +1,5 @@
 package io.reactorsolutions.vertx_kafka;
 
-import io.reactorsolutions.Main;
 import io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;

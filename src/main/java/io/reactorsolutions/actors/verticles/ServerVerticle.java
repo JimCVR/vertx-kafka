@@ -4,7 +4,10 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactorsolutions.actors.manager.Register;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
@@ -17,6 +20,13 @@ import org.slf4j.LoggerFactory;
 public class ServerVerticle extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
+  private EventBus eventBus;
+
+  @Override
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx, context);
+    eventBus = vertx.eventBus();
+  }
 
   @Override
   public void start() throws Exception {
@@ -36,7 +46,7 @@ public class ServerVerticle extends AbstractVerticle {
     var deploymentId = Register.getConnectedUsers().get(usernameParam);
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     if (Register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId)) {
-      vertx.eventBus().<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
+      eventBus.<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
         LOG.debug("Message received: {}", reply.body().toBuffer());
         serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(reply.body().toBuffer());
       });

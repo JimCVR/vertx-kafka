@@ -1,6 +1,5 @@
 package io.reactorsolutions.vertx_kafka.verticles;
 
-import io.reactorsolutions.vertx_kafka.MainVertxConsumer;
 import io.reactorsolutions.vertx_kafka.config.consumer.ConsumerOptions;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
@@ -14,8 +13,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class ConsumerVerticle extends AbstractVerticle {
 
@@ -41,7 +38,6 @@ public class ConsumerVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) {
     consumer
-      //handler(System.out::println)
       .handler(record -> handler(record))
       .subscribe("topic33").onComplete(
         v -> startPromise.complete(),
