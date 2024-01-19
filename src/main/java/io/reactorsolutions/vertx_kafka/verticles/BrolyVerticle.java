@@ -1,12 +1,12 @@
 package io.reactorsolutions.vertx_kafka.verticles;
 
 import io.reactorsolutions.vertx_kafka.models.Fighter;
-import io.reactorsolutions.vertx_kafka.producer_consumer.Consumer;
-import io.reactorsolutions.vertx_kafka.producer_consumer.Producer;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
+import io.reactorsolutions.vertx_kafka.config.consumer.ConsumerOptions;
+import io.reactorsolutions.vertx_kafka.config.producer.ProducerOptions;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonObject;
+import io.vertx.kafka.client.consumer.KafkaConsumer;
 import io.vertx.kafka.client.producer.KafkaProducer;
 import io.vertx.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
@@ -14,25 +14,27 @@ import org.slf4j.LoggerFactory;
 
 public class BrolyVerticle extends AbstractVerticle {
 
-  //Se envian y reciben JSON de broly
+  //Send and receives broly's JsonObject
   public static final String FIRSTLOCATION = "planet.vegeta";
-  //Se envian y reciben String de daño del cliente
+  //Send and receives client's damage String
   public static final String SECONDLOCATION = "planet.earth";
-  private static final Logger LOG = LoggerFactory.getLogger(BrolyVerticle.class);
 
-  public Producer producer;
-  public Consumer consumer;
+  private KafkaProducer<String, JsonObject> producer;
+  private KafkaConsumer<String, JsonObject> consumer;
   private Fighter fighter;
+  private String deploymentID;
 
-  public BrolyVerticle() {
+  @Override
+  public void init(Vertx vertx, Context context) {
+    super.init(vertx, context);
     fighter = new Fighter("Broly", 500, 500, 20, 50, 500, 100, 100, "KAKAROTTOOO!");
+    producer = KafkaProducer.create(vertx,new ProducerOptions().getConfig());
+    consumer = KafkaConsumer.create(vertx,new ConsumerOptions().getConfig());
+    deploymentID = vertx.getOrCreateContext().deploymentID();
   }
 
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
-    String deploymentID = vertx.getOrCreateContext().deploymentID();
-    producer = new Producer(vertx);
-    consumer = new Consumer(vertx);
 
     producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(recordMetadata -> {
       System.out.println(" written on topic=" + recordMetadata.getTopic() +

@@ -19,7 +19,7 @@ public class WarriorVerticle extends AbstractVerticle {
 
   @Override
   public void init(Vertx vertx, Context context) {
-    super.init(vertx,context);
+    super.init(vertx, context);
     var ctx = vertx.getOrCreateContext();
     var config = ctx.config();
     deploymentID = ctx.deploymentID();
