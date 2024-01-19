@@ -56,7 +56,7 @@ public class ServerVerticle extends AbstractVerticle {
   }
 
   private void getAllUsersHandler(RoutingContext ctx) {
-    JsonObject response = JsonObject.mapFrom(register.getConnectedUsers());
+    JsonObject response = JsonObject.mapFrom(Register.getConnectedUsers());
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(response.toBuffer());
   }
