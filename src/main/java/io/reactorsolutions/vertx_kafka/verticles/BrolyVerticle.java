@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 public class BrolyVerticle extends AbstractVerticle {
 
-  //Se envian y reciben JSON de broly
+  //Send and receives broly's JsonObject
   public static final String FIRSTLOCATION = "planet.vegeta";
-  //Se envian y reciben String de daño del cliente
+  //Send and receives client's damage String
   public static final String SECONDLOCATION = "planet.earth";
   private static final Logger LOG = LoggerFactory.getLogger(BrolyVerticle.class);
 

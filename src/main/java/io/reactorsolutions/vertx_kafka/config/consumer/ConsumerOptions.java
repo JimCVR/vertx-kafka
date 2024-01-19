@@ -11,13 +11,13 @@ public class ConsumerOptions {
 
   public ConsumerOptions() {
     config = new HashMap<>();
-    config.put("bootstrap.servers", "localhost:29092,localhost:39092");
-    config.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-    config.put("value.deserializer", "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
-    config.put("auto.offset.reset", "earliest");
-    config.put("group.id", "reactorSolutions-2");
+    config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092,localhost:39092");
+    config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
+    config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
+    config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    config.put(ConsumerConfig.GROUP_ID_CONFIG, "reactorSolutions-2");
     config.put(ConsumerConfig.GROUP_INSTANCE_ID_CONFIG,("SchedulerCoordinator"+ UUID.randomUUID()));
-    config.put("enable.auto.commit", "false");
+    config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
   }
 
   public Map<String, String> getConfig() {

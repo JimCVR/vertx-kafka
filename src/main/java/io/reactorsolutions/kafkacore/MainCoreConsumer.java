@@ -20,11 +20,11 @@ import static io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle.SERVER_
 public class MainCoreConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MainCoreConsumer.class);
   public static void main(String[] args) throws ExecutionException, InterruptedException {
-    KafkaConsumer<String, JsonObject> consumer = new KafkaConsumer<>(new ConsumerOptions().getConfig());
+    KafkaConsumer<String, JsonObject> consumer = new KafkaConsumer(new ConsumerOptions().getConfig());
     var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
     var client  = HttpClient.newHttpClient();
 
-    consumer.subscribe(Arrays.asList("baeldung"));
+    consumer.subscribe(Arrays.asList("coreConsumer"));
 
     while (true) {
       ConsumerRecords<String, JsonObject> records = consumer.poll(Duration.ofMillis(100));
@@ -35,7 +35,7 @@ public class MainCoreConsumer {
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
           .thenAccept(result -> System.out.println("body: "+ result.body() +", status code: "+result.statusCode()))
           .thenAccept(v -> System.out.println(Thread.currentThread().getName()))
-          .thenAccept(v -> consumer.commitAsync()).get();
+          .thenAccept(v -> consumer.commitSync()).get();
       }
     }
   }

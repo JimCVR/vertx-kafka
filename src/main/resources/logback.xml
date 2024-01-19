@@ -7,10 +7,12 @@
   </appender>
 
   <logger name="io.reactorsolutions" level="DEBUG"/>
+  <logger name="org.apache.kafka.clients.consumer.internals.Fetcher" level="trace"/>
+
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
   </root>
-  <root level="error">
-    <appender-ref ref="CONSOLE"/>
+  <root level="trace">
+    <appender-ref ref="STDOUT"/>
   </root>
 </configuration>

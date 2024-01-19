@@ -28,13 +28,16 @@ public class RxConsumerVerticle extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-    return consumer.subscribe("rxJava").andThen((CompletableSource) completableObserver ->
-      consumer
-        .toFlowable()
-        .map(record -> record.value())
-        .buffer(5)
-        .map(ArrayList::new)
-        .subscribe(val -> val.forEach(it-> System.out.println(it.toString()))));
+    return consumer.subscribe("rxJava")
+      .andThen(
+        consumer
+          .toFlowable()
+          .map(KafkaConsumerRecord::value)
+          .buffer(5)
+          .map(ArrayList::new)
+          .doOnNext(val -> val.forEach(it-> System.out.println(it.toString())))
+          .ignoreElements()
+      );
   }
 
   private void consumerHandler(KafkaConsumerRecord<String, JsonObject> record) {

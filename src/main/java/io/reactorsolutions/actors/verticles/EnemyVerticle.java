@@ -27,7 +27,6 @@ public class EnemyVerticle extends AbstractVerticle {
 
   @Override
   public void start() {
-
     handlingDamageReceived();
     vertx.setPeriodic(1000, handler -> attack());
     vertx.setPeriodic(5000, handler -> regen());

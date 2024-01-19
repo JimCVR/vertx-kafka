@@ -15,7 +15,7 @@ public class MainCoreProducer {
     KafkaProducer<String, JsonObject> producer = new KafkaProducer(new ProducerOptions().getConfig());
 
     for (int i = 1; i <= 10; i++) {
-      ProducerRecord<String, JsonObject> record = new ProducerRecord<>("baeldung",new JsonObject().put("key "+i ,String.valueOf(i)));
+      ProducerRecord<String, JsonObject> record = new ProducerRecord<>("coreConsumer",new JsonObject().put("key "+i ,String.valueOf(i)));
       producer.send(record).get();
       LOG.debug("sending {}", record.value());
     }
