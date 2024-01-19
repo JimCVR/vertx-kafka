@@ -13,9 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
 import static io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle.SERVER_URI;
 
@@ -26,30 +24,18 @@ public class MainCoreConsumer {
     var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
     var client  = HttpClient.newHttpClient();
 
-    consumer.subscribe(Arrays.asList("coreConsumer-3"));
-    var worker = Executors.newSingleThreadExecutor(r -> new Thread(r, "reactorsolutions-consumer-kafka-thread"));
-    while (true) {
-      CompletableFuture.supplyAsync(()-> consumer.poll(Duration.ofMillis(100)), worker).thenApply(records -> {
-        for (ConsumerRecord<String, JsonObject> record : records) {
-          LOG.debug("Record value: {} , offset: {}",record.value(), record.offset());
-          client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-      })
+    consumer.subscribe(Arrays.asList("coreConsumer"));
 
-      /*for (ConsumerRecord<String, JsonObject> record : records) {
+    while (true) {
+      ConsumerRecords<String, JsonObject> records = consumer.poll(Duration.ofMillis(100));
+      System.out.println("polling");
+
+      for (ConsumerRecord<String, JsonObject> record : records) {
         LOG.debug("Record value: {} , offset: {}",record.value(), record.offset());
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
           .thenAccept(result -> System.out.println("body: "+ result.body() +", status code: "+result.statusCode()))
           .thenAccept(v -> System.out.println(Thread.currentThread().getName()))
-          .thenAccept(v -> {
-            LOG.debug("Commiting message");
-            try{
-              consumer.commitSync();
-
-            }catch (Exception e){
-              e.printStackTrace();
-            }
-          })
-          .thenAccept(v -> System.out.println("Committed"));
+          .thenAccept(v -> consumer.commitAsync()).get();
       }
     }
   }

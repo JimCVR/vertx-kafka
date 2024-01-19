@@ -11,7 +11,7 @@ public class ConsumerOptions {
 
   public ConsumerOptions() {
     config = new HashMap<>();
-    config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092,localhost:39092");
     config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
     config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
