@@ -18,7 +18,6 @@ public class ConsumerLoopVerticle extends AbstractVerticle {
   public void init(Vertx vertx, Context context) {
     super.init(vertx, context);
     consumer = KafkaConsumer.create(vertx, new ConsumerOptions().getConfig());
-
   }
 
   @Override

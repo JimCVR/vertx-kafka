@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class BatchConsumerVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(BatchConsumerVerticle.class);
-  KafkaConsumer<String, JsonObject> consumer;
-
+  private KafkaConsumer<String, JsonObject> consumer;
 
   @Override
   public void init(Vertx vertx, Context context) {

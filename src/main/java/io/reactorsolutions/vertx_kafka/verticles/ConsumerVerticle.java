@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
 public class ConsumerVerticle extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConsumerVerticle.class);
-  public static final URI SERVER_URI = URI.create("https://80e3fc1e-acf1-4d12-aaae-04db1f9b9329.mock.pstmn.io/test-ok");
+  public static final URI SERVER_URI = URI.create("my-url");
   private KafkaConsumer<String, JsonObject> consumer;
   private WebClient webClient;
   private HttpClient javaClient;

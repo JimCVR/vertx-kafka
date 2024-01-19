@@ -24,11 +24,10 @@ public class MainCoreConsumer {
     var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
     var client  = HttpClient.newHttpClient();
 
-    consumer.subscribe(Arrays.asList("coreConsumer"));
+    consumer.subscribe(Arrays.asList("coreConsumer-3"));
 
     while (true) {
       ConsumerRecords<String, JsonObject> records = consumer.poll(Duration.ofMillis(100));
-      System.out.println("polling");
 
       for (ConsumerRecord<String, JsonObject> record : records) {
         LOG.debug("Record value: {} , offset: {}",record.value(), record.offset());

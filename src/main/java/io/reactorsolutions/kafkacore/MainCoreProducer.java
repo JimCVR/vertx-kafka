@@ -14,8 +14,8 @@ public class MainCoreProducer {
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     KafkaProducer<String, JsonObject> producer = new KafkaProducer(new ProducerOptions().getConfig());
 
-    for (int i = 1; i <= 10; i++) {
-      ProducerRecord<String, JsonObject> record = new ProducerRecord<>("coreConsumer",new JsonObject().put("key "+i ,String.valueOf(i)));
+    for (int i = 1; i <= 2; i++) {
+      ProducerRecord<String, JsonObject> record = new ProducerRecord<>("coreConsumer-3",new JsonObject().put("key "+i ,String.valueOf(i)));
       producer.send(record).get();
       LOG.debug("sending {}", record.value());
     }
