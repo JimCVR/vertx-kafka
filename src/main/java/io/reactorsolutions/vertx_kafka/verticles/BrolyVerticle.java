@@ -18,7 +18,6 @@ public class BrolyVerticle extends AbstractVerticle {
   public static final String FIRSTLOCATION = "planet.vegeta";
   //Send and receives client's damage String
   public static final String SECONDLOCATION = "planet.earth";
-  private static final Logger LOG = LoggerFactory.getLogger(BrolyVerticle.class);
 
   private KafkaProducer<String, JsonObject> producer;
   private KafkaConsumer<String, JsonObject> consumer;
@@ -37,9 +36,12 @@ public class BrolyVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
 
-    producer.send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(v ->{
-      LOG.debug("Message sent");
-    });
+    producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject())).onSuccess(recordMetadata -> {
+      System.out.println(" written on topic=" + recordMetadata.getTopic() +
+        ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
+      );
+    }).onFailure(err -> err.printStackTrace());
+    //vertx.eventBus().consumer(SECONDLOCATION, getDamageHandler(deploymentID));
     vertx.setPeriodic(fighter.aSpd()+2000, handler -> fighterTurn());
     startPromise.complete();
   }
@@ -67,8 +69,11 @@ public class BrolyVerticle extends AbstractVerticle {
   public void fighterTurn() {
     fighter.attack();
     fighter.checkStats();
-    producer.send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject()))
-      .onSuccess(v -> LOG.debug("Message sent")
-      ).onFailure(Throwable::printStackTrace);
+    producer.getProducer().send(KafkaProducerRecord.create("broly", "1", fighter.toJsonObject()))
+      .onSuccess(recordMetadata -> {
+        System.out.println(" written on topic=" + recordMetadata.getTopic() +
+          ", partition=" + recordMetadata.getPartition() + ", offset=" + recordMetadata.getOffset()
+        );
+      }).onFailure(err -> err.printStackTrace());
   }
 }

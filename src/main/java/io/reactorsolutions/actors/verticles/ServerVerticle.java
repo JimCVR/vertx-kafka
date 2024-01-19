@@ -46,7 +46,7 @@ public class ServerVerticle extends AbstractVerticle {
     var deploymentId = Register.getConnectedUsers().get(usernameParam);
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     if (Register.isConnectedUser(usernameParam) && vertx.deploymentIDs().contains(deploymentId)) {
-      eventBus.<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
+      vertx.eventBus().<JsonObject>request(deploymentId, deploymentId).onSuccess(reply -> {
         LOG.debug("Message received: {}", reply.body().toBuffer());
         serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(reply.body().toBuffer());
       });
@@ -56,7 +56,7 @@ public class ServerVerticle extends AbstractVerticle {
   }
 
   private void getAllUsersHandler(RoutingContext ctx) {
-    JsonObject response = JsonObject.mapFrom(Register.getConnectedUsers());
+    JsonObject response = JsonObject.mapFrom(register.getConnectedUsers());
     HttpServerResponse serverResponse = ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
     serverResponse.setStatusCode(HttpResponseStatus.OK.code()).end(response.toBuffer());
   }
