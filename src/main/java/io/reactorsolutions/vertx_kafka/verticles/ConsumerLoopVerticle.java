@@ -58,23 +58,3 @@ public class ConsumerLoopVerticle extends AbstractVerticle {
     consumer.commit().onSuccess(handler -> System.out.println("Commited Offset: " + record.offset()));
   }
 }
-
-/*
-* Vamos a crear un ejemplo donde un evento es consumido, realizar una petición http
-* (o alguna operación que implique una comunicación IO que pueda fallar) y esa petición falle.
-
-Vamos a implementar sobre eso un sistema de reintento muy simple. Vamos a esperar un tiempo
-*  en el catch de la operación y volver a procesar el evento, y que esta vez funcione.
-
-No tienes que hacer un servidor http real al que realices la petición, vale con hacer un método
-*  que devuelva la primera vez una excepción y la segunda un resultado correcto.
-
-Una vez hecho eso, tenemos que modificar esta propiedad en el consumer: max.poll.interval.ms
-
-Esta propiedad tiene un valor por defecto de 300000 (5 minutos). Si lo bajamos a por ejemplo medio minuto y el
-*  thread sleep que estamos poniendo a la hora de hacer el retry es superior a medio minuto, kafka debería considerar
-*  nuestro consumer muerto y el commit debería fallar.
-
-Vamos a intentar simular también este caso
-*
-* */
