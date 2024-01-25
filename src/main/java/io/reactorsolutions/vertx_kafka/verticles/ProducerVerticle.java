@@ -23,12 +23,8 @@ public class ProducerVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> startPromise) {
-    for (int i = 0; i < 10; i++) {
-      producer.send(KafkaProducerRecord.create("topic33", KEY_1, new JsonObject().put(KEY_1 + "", "" + i)))
-        .onSuccess(recordMetadata -> System.out.println(recordMetadata.getOffset()))
-        .onFailure(Throwable::printStackTrace);
-
-      producer.send(KafkaProducerRecord.create("topic33", KEY_2, new JsonObject().put(KEY_2 + "", "" + (i+i))))
+    for (int i = 0; i < 3; i++) {
+      producer.send(KafkaProducerRecord.create(KEY_2, new JsonObject().put(KEY_1 + "", "" + i)))
         .onSuccess(recordMetadata -> System.out.println(recordMetadata.getOffset()))
         .onFailure(Throwable::printStackTrace);
     }

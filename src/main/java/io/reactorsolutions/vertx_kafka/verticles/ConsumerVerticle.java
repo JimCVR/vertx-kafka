@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
 public class ConsumerVerticle extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConsumerVerticle.class);
-  public static final URI SERVER_URI = URI.create("my-url");
+  public static final URI SERVER_URI = URI.create("my-URI");
   private KafkaConsumer<String, JsonObject> consumer;
   private WebClient webClient;
   private HttpClient javaClient;

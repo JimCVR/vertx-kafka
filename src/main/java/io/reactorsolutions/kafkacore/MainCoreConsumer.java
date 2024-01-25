@@ -8,24 +8,32 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import static io.reactorsolutions.vertx_kafka.verticles.ConsumerVerticle.SERVER_URI;
 
 public class MainCoreConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MainCoreConsumer.class);
-  public static void main(String[] args) throws ExecutionException, InterruptedException {
+
+  public static void main(String[] args) throws ExecutionException, InterruptedException, URISyntaxException {
     KafkaConsumer<String, JsonObject> consumer = new KafkaConsumer(new ConsumerOptions().getConfig());
     var request = HttpRequest.newBuilder().uri(SERVER_URI).build();
-    var client  = HttpClient.newHttpClient();
+    var client = HttpClient.newHttpClient();
 
     consumer.subscribe(Arrays.asList("coreConsumer-3"));
+    coreConsumer(consumer, request, client);
+  }
 
+  private static void coreConsumer(KafkaConsumer<String, JsonObject> consumer, HttpRequest request, HttpClient client) throws InterruptedException, ExecutionException {
     while (true) {
       ConsumerRecords<String, JsonObject> records = consumer.poll(Duration.ofMillis(100));
 
